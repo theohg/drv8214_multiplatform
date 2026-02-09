@@ -28,5 +28,9 @@
     "license": "MIT",
     "frameworks": "arduino",
     "platforms": "*",
-    "headers": "drv8214.h"
+    "headers": "drv8214.h",
+    "build": {
+        "srcDir": "src",
+        "includeDir": "include"
+    }
 }
