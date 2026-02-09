@@ -39,11 +39,11 @@ jobs:
       - name: Compile examples
         run: |
           # 1. Create a temporary staging folder for the library
-          mkdir -p lib_staging/DRV8214
+          mkdir -p lib_staging/drv8214_multiplatform
 
           # 2. Copy the essential library files into that specific subfolder
-          cp -r src include library.json lib_staging/DRV8214/
+          cp -r src include library.json lib_staging/drv8214_multiplatform/
 
-          # 3. Point the CI to the staging folder
-          pio ci --lib="lib_staging/DRV8214" --board=${{ matrix.board }} examples/basic_motor_control/basic_motor_control.ino
-          pio ci --lib="lib_staging/DRV8214" --board=${{ matrix.board }} examples/fault_monitoring/fault_monitoring.ino
+          # 3. Point the CI to the staging folder (the directory containing the library)
+          pio ci --lib="lib_staging" --board=${{ matrix.board }} examples/basic_motor_control/basic_motor_control.ino
+          pio ci --lib="lib_staging" --board=${{ matrix.board }} examples/fault_monitoring/fault_monitoring.ino

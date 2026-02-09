@@ -7,7 +7,7 @@
  */
 
 #include <Wire.h>
-#include <drv8214.h>
+#include "drv8214.h"
 
 /* ── Adapt these to your hardware ── */
 #define I2C_ADDR          DRV8214_I2C_ADDR_00  // 0x30 (7-bit)
