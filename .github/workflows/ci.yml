@@ -37,10 +37,13 @@ jobs:
         run: pip install platformio
 
       - name: Compile examples
-        env:
-          # This tells PlatformIO to look for libraries in the root of the checkout
-          PLATFORMIO_LIB_EXTRA_DIRS: ${{ github.workspace }}
         run: |
-          # Removed --lib="."
-          pio ci --board=${{ matrix.board }} examples/basic_motor_control/basic_motor_control.ino
-          pio ci --board=${{ matrix.board }} examples/fault_monitoring/fault_monitoring.ino
+          # 1. Create a temporary staging folder for the library
+          mkdir -p lib_staging/DRV8214
+
+          # 2. Copy the essential library files into that specific subfolder
+          cp -r src include library.json lib_staging/DRV8214/
+
+          # 3. Point the CI to the staging folder
+          pio ci --lib="lib_staging/DRV8214" --board=${{ matrix.board }} examples/basic_motor_control/basic_motor_control.ino
+          pio ci --lib="lib_staging/DRV8214" --board=${{ matrix.board }} examples/fault_monitoring/fault_monitoring.ino
