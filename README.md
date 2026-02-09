@@ -1,7 +1,8 @@
 # DRV8214 Multiplatform Library
 
-![License](https://img.shields.io/badge/license-MIT-blue)
-![Version](https://img.shields.io/badge/version-1.0.0-green)
+[![License](https://img.shields.io/github/license/theohg/drv8214_multiplatform)](LICENSE.txt)
+[![Release](https://img.shields.io/github/v/release/theohg/drv8214_multiplatform)](https://github.com/theohg/drv8214_multiplatform/releases)
+[![CI](https://img.shields.io/github/actions/workflow/status/theohg/drv8214_multiplatform/ci.yml?label=CI)](https://github.com/theohg/drv8214_multiplatform/actions)
 ![Platform](https://img.shields.io/badge/platform-Arduino%20%7C%20ESP32%20%7C%20STM32-orange)
 ![PlatformIO](https://img.shields.io/badge/PlatformIO-compatible-brightgreen)
 ![Language](https://img.shields.io/badge/C%2B%2B-11-blue)
@@ -60,7 +61,7 @@ Add to your `platformio.ini`:
 
 ```ini
 lib_deps =
-    https://github.com/PatateMagique/drv8214_multiplatform.git#v1.0.0
+    https://github.com/theohg/drv8214_multiplatform.git#v1.0.0
 ```
 
 ### Arduino IDE
@@ -72,7 +73,7 @@ lib_deps =
 ### STM32 (CubeMX / HAL)
 
 1. Copy `include/` and `src/` into your project
-2. In `drv8214_platform_i2c.h`, change `#include "stm32wbxx_hal.h"` to match your MCU family (e.g. `stm32f4xx_hal.h`)
+2. The HAL header is auto-detected from your STM32 family define (e.g. `STM32F4xx`). If auto-detection fails, add `-DDRV8214_STM32_HAL_HEADER='"stm32f4xx_hal.h"'` to your build flags
 3. Call `drv8214_i2c_set_handle(&hi2c1)` once in your initialization code before using the driver
 
 ## Quick Start
@@ -207,4 +208,4 @@ graph LR
 
 MIT License -- see [LICENSE.txt](LICENSE.txt) for details.
 
-Copyright (c) 2025 Theo Heng
+Copyright (c) 2026 Theo Heng

@@ -2,7 +2,7 @@
  * @file drv8214.cpp
  * @brief Implementation of the DRV8214 driver class.
  *
- * @copyright Copyright (c) 2025 Theo Heng
+ * @copyright Copyright (c) 2026 Theo Heng
  * @license MIT License. See LICENSE file for details.
  */
 
@@ -602,7 +602,7 @@ void DRV8214::turnForward(uint16_t speed, float voltage, float requested_current
 }
 
 void DRV8214::turnReverse(uint16_t speed, float voltage, float requested_current) {
-    enableHbridge();
+    disableHbridge();
 
     switch (config.regulation_mode) {
         case CURRENT_FIXED:
@@ -625,6 +625,7 @@ void DRV8214::turnReverse(uint16_t speed, float voltage, float requested_current
         drv8214_i2c_modify_register(address, DRV8214_CONFIG4, CONFIG4_I2C_PH_IN2, false);
     }
 
+    enableHbridge();
     if (config.verbose) { drvPrint("Turning Reverse\n"); }
 }
 

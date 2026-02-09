@@ -7,7 +7,7 @@
  *
  * @see DRV8214 datasheet: https://www.ti.com/product/DRV8214
  *
- * @copyright Copyright (c) 2025 Theo Heng
+ * @copyright Copyright (c) 2026 Theo Heng
  * @license MIT License. See LICENSE file for details.
  */
 
@@ -16,13 +16,6 @@
 
 #include "drv8214_platform_config.h"
 #include "drv8214_platform_i2c.h"
-
-/** @brief Success return code. */
-#define DRV8214_OK          0
-/** @brief I2C communication error (NACK, timeout, bus error). */
-#define DRV8214_ERR_I2C     1
-/** @brief STM32: I2C handle not initialized (call drv8214_i2c_set_handle first). */
-#define DRV8214_ERR_HANDLE  2
 
 /* ───────────────────────── I2C Addresses ───────────────────────── */
 
@@ -107,31 +100,31 @@
 
 /** @name CONFIG3 (0x0C)
  *  @{ */
-#define CONFIG3_IMODE        0xC0  /**< Bits [7:6] - Current regulation mode. */
-#define CONFIG3_SMODE        0x20  /**< Bit 5   - Stall mode (0=disable outputs, 1=keep driving). */
-#define CONFIG3_INT_VREF     0x10  /**< Bit 4   - Internal VREF enable (fixed 500mV). */
-#define CONFIG3_TBLANK       0x08  /**< Bit 3   - Blanking time (0=1.8us, 1=1.0us). */
-#define CONFIG3_TDEG         0x04  /**< Bit 2   - Deglitch time (0=2us, 1=1us). */
-#define CONFIG3_OCP_MODE     0x02  /**< Bit 1   - OCP mode (0=latch off, 1=auto-retry). */
-#define CONFIG3_TSD_MODE     0x01  /**< Bit 0   - TSD mode. */
+#define CONFIG3_IMODE        0xC0  /**< Bits [7:6]  - Current regulation mode. */
+#define CONFIG3_SMODE        0x20  /**< Bit 5       - Stall mode (0=disable outputs, 1=keep driving). */
+#define CONFIG3_INT_VREF     0x10  /**< Bit 4       - Internal VREF enable (fixed 500mV). */
+#define CONFIG3_TBLANK       0x08  /**< Bit 3       - Blanking time (0=1.8us, 1=1.0us). */
+#define CONFIG3_TDEG         0x04  /**< Bit 2       - Deglitch time (0=2us, 1=1us). */
+#define CONFIG3_OCP_MODE     0x02  /**< Bit 1       - OCP mode (0=latch off, 1=auto-retry). */
+#define CONFIG3_TSD_MODE     0x01  /**< Bit 0       - TSD mode. */
 /** @} */
 
 /** @name CONFIG4 (0x0D)
  *  @{ */
 #define CONFIG4_RC_REP       0xC0  /**< Bits [7:6] - Ripple count reporting mode. */
-#define CONFIG4_STALL_REP    0x20  /**< Bit 5   - Stall reporting on nFAULT. */
-#define CONFIG4_CBC_REP      0x10  /**< Bit 4   - Cycle-by-cycle current regulation reporting. */
-#define CONFIG4_PMODE        0x08  /**< Bit 3   - Control mode (0=PH/EN, 1=PWM). */
-#define CONFIG4_I2C_BC       0x04  /**< Bit 2   - Bridge control source (0=INx pins, 1=I2C). */
-#define CONFIG4_I2C_EN_IN1   0x02  /**< Bit 1   - I2C bridge control: EN/IN1. */
-#define CONFIG4_I2C_PH_IN2   0x01  /**< Bit 0   - I2C bridge control: PH/IN2. */
+#define CONFIG4_STALL_REP    0x20  /**< Bit 5      - Stall reporting on nFAULT. */
+#define CONFIG4_CBC_REP      0x10  /**< Bit 4      - Cycle-by-cycle current regulation reporting. */
+#define CONFIG4_PMODE        0x08  /**< Bit 3      - Control mode (0=PH/EN, 1=PWM). */
+#define CONFIG4_I2C_BC       0x04  /**< Bit 2      - Bridge control source (0=INx pins, 1=I2C). */
+#define CONFIG4_I2C_EN_IN1   0x02  /**< Bit 1      - I2C bridge control: EN/IN1. */
+#define CONFIG4_I2C_PH_IN2   0x01  /**< Bit 0      - I2C bridge control: PH/IN2. */
 /** @} */
 
 /** @name REG_CTRL0 (0x0E)
  *  @{ */
-#define REG_CTRL0_EN_SS      0x20  /**< Bit 5     - Soft start/stop enable. */
+#define REG_CTRL0_EN_SS      0x20  /**< Bit 5      - Soft start/stop enable. */
 #define REG_CTRL0_REG_CTRL   0x18  /**< Bits [4:3] - Regulation mode. */
-#define REG_CTRL0_PWM_FREQ   0x04  /**< Bit 2     - PWM frequency (0=50kHz, 1=25kHz). */
+#define REG_CTRL0_PWM_FREQ   0x04  /**< Bit 2      - PWM frequency (0=50kHz, 1=25kHz). */
 #define REG_CTRL0_W_SCALE    0x03  /**< Bits [1:0] - Speed scaling factor. */
 /** @} */
 
@@ -143,9 +136,9 @@
 
 /** @name RC_CTRL0 (0x11)
  *  @{ */
-#define RC_CTRL0_EN_RC        0x80  /**< Bit 7     - Enable ripple counting. */
-#define RC_CTRL0_DIS_EC       0x40  /**< Bit 6     - Disable error correction. */
-#define RC_CTRL0_RC_HIZ       0x20  /**< Bit 5     - H-bridge Hi-Z when count exceeds threshold. */
+#define RC_CTRL0_EN_RC        0x80  /**< Bit 7      - Enable ripple counting. */
+#define RC_CTRL0_DIS_EC       0x40  /**< Bit 6      - Disable error correction. */
+#define RC_CTRL0_RC_HIZ       0x20  /**< Bit 5      - H-bridge Hi-Z when count exceeds threshold. */
 #define RC_CTRL0_FLT_GAIN_SEL 0x18  /**< Bits [4:3] - Filter gain selection. */
 #define RC_CTRL0_CS_GAIN_SEL  0x07  /**< Bits [2:0] - Current sense gain selection. */
 /** @} */
@@ -165,7 +158,7 @@
 
 /** @name RC_CTRL6 (0x17)
  *  @{ */
-#define RC_CTRL6_EC_PULSE_DIS 0x80  /**< Bit 7     - Disable error correction pulse. */
+#define RC_CTRL6_EC_PULSE_DIS 0x80  /**< Bit 7      - Disable error correction pulse. */
 #define RC_CTRL6_T_MECH_FLT   0x70  /**< Bits [6:4] - Mechanical fault detection time. */
 #define RC_CTRL6_EC_FALSE_PER 0x0C  /**< Bits [3:2] - Error correction false period. */
 #define RC_CTRL6_EC_MISS_PER  0x03  /**< Bits [1:0] - Error correction miss period. */
@@ -211,29 +204,29 @@ enum RegulationMode {
  * All fields have sensible defaults. Pass to DRV8214::init() to apply.
  */
 struct DRV8214_Config {
-    bool I2CControlled = true;               /**< Bridge controlled via I2C (vs. INx pins). */
-    ControlMode control_mode = PWM;          /**< H-bridge control mode. */
-    RegulationMode regulation_mode = SPEED;  /**< Regulation loop mode. */
-    bool voltage_range = true;               /**< Voltage range (false=0..15.7V, true=0..3.92V). */
-    float Vref = 0.5f;                       /**< Current-sense reference voltage [V]. */
-    bool stall_enabled = true;               /**< Enable stall detection. */
-    bool ovp_enabled = true;                 /**< Enable overvoltage protection. */
-    bool stall_behavior = false;             /**< Stall action (false=disable outputs, true=keep driving). */
+    bool I2CControlled = true;                /**< Bridge controlled via I2C (vs. INx pins). */
+    ControlMode control_mode = PWM;           /**< H-bridge control mode. */
+    RegulationMode regulation_mode = SPEED;   /**< Regulation loop mode. */
+    bool voltage_range = true;                /**< Voltage range (false=0..15.7V, true=0..3.92V). */
+    float Vref = 0.5f;                        /**< Current-sense reference voltage [V]. */
+    bool stall_enabled = true;                /**< Enable stall detection. */
+    bool ovp_enabled = true;                  /**< Enable overvoltage protection. */
+    bool stall_behavior = false;              /**< Stall action (false=disable outputs, true=keep driving). */
     bool bridge_behavior_thr_reached = false; /**< At ripple threshold (false=keep driving, true=Hi-Z). */
-    uint8_t current_reg_mode = 3;            /**< IMODE [1:0]: 0=none, 1=inrush only, 2-3=always. */
-    float Aipropri = 0;                      /**< Current mirror gain [A/A] (set by CS_GAIN_SEL). */
-    float Itrip = 0.0f;                      /**< Calculated trip current [A]. */
-    float MaxCurrent = 0.0f;                 /**< Maximum current [A] (set by CS_GAIN_SEL). */
-    uint8_t w_scale = 128;                   /**< Speed scaling factor for WSET_VSET. */
-    bool verbose = false;                    /**< Print debug information via drvPrint(). */
-    uint16_t inrush_duration = 500;          /**< Stall-detection blanking time [ms]. */
-    uint8_t inv_r = 0;                       /**< Inverse motor resistance register value. */
-    uint16_t inv_r_scale = 0;               /**< Inverse resistance scale factor. */
-    uint8_t kmc = 30;                        /**< KMC register value. */
-    uint8_t kmc_scale = 0b11;               /**< KMC scale bits. */
-    bool soft_start_stop_enabled = false;    /**< Enable soft start/stop ramp. */
-    uint16_t ripple_threshold = 0;           /**< Ripple count threshold (before scaling). */
-    uint8_t ripple_threshold_scale = 2;      /**< Ripple threshold scale bits. */
+    uint8_t current_reg_mode = 3;             /**< IMODE [1:0]: 0=none, 1=inrush only, 2-3=always. */
+    float Aipropri = 0;                       /**< Current mirror gain [A/A] (set by CS_GAIN_SEL). */
+    float Itrip = 0.0f;                       /**< Calculated trip current [A]. */
+    float MaxCurrent = 0.0f;                  /**< Maximum current [A] (set by CS_GAIN_SEL). */
+    uint8_t w_scale = 128;                    /**< Speed scaling factor for WSET_VSET. */
+    bool verbose = false;                     /**< Print debug information via drvPrint(). */
+    uint16_t inrush_duration = 500;           /**< Stall-detection blanking time [ms]. */
+    uint8_t inv_r = 0;                        /**< Inverse motor resistance register value. */
+    uint16_t inv_r_scale = 0;                 /**< Inverse resistance scale factor. */
+    uint8_t kmc = 30;                         /**< KMC register value. */
+    uint8_t kmc_scale = 0b11;                 /**< KMC scale bits. */
+    bool soft_start_stop_enabled = false;     /**< Enable soft start/stop ramp. */
+    uint16_t ripple_threshold = 0;            /**< Ripple count threshold (before scaling). */
+    uint8_t ripple_threshold_scale = 2;       /**< Ripple threshold scale bits. */
 };
 
 /* ──────────────────── Driver Class ──────────────────── */
@@ -266,8 +259,8 @@ private:
 public:
     /**
      * @brief Construct a DRV8214 driver instance.
-     * @param addr   7-bit I2C address (use DRV8214_I2C_ADDR_xx defines).
-     * @param id     Driver identifier (for multi-driver setups).
+     * @param addr            7-bit I2C address (use DRV8214_I2C_ADDR_xx defines).
+     * @param id              Driver identifier (for multi-driver setups).
      * @param sense_resistor  IPROPI resistor value [Ohms].
      * @param ripples         Ripples per rotor revolution.
      * @param rm              Motor winding resistance [Ohms].
@@ -289,73 +282,73 @@ public:
 
     /** @name Status Getters
      *  @{ */
-    uint8_t  getDriverAddress();
-    uint8_t  getDriverID();
-    uint8_t  getSenseResistor();
-    uint8_t  getRipplesPerRevolution();
-    uint8_t  getFaultStatus();          /**< Read the FAULT register. */
-    uint32_t getMotorSpeedRPM();        /**< Rotor speed [RPM] from ripple count. */
-    uint16_t getMotorSpeedRAD();        /**< Rotor speed [rad/s] from ripple count. */
-    uint16_t getMotorSpeedShaftRPM();   /**< Output shaft speed [RPM] (after reduction). */
-    uint16_t getMotorSpeedShaftRAD();   /**< Output shaft speed [rad/s] (after reduction). */
-    uint8_t  getMotorSpeedRegister();   /**< Raw RC_STATUS1 register value. */
-    uint16_t getRippleCount();          /**< 16-bit ripple counter. */
-    float    getMotorVoltage();         /**< Motor voltage [V] (scaled by voltage range). */
-    uint8_t  getMotorVoltageRegister(); /**< Raw REG_STATUS1 register value. */
-    float    getMotorCurrent();         /**< Motor current [A] (scaled by CS_GAIN_SEL). */
-    uint8_t  getMotorCurrentRegister(); /**< Raw REG_STATUS2 register value. */
-    uint8_t  getDutyCycle();            /**< Bridge duty cycle [0..100 %]. */
+    uint8_t  getDriverAddress();         /**< 7-bit I2C address. */
+    uint8_t  getDriverID();              /**< Driver identifier. */
+    uint8_t  getSenseResistor();         /**< IPROPI sense resistor [Ohms]. */
+    uint8_t  getRipplesPerRevolution();  /**< Ripples per rotor revolution. */
+    uint8_t  getFaultStatus();           /**< Read the FAULT register. */
+    uint32_t getMotorSpeedRPM();         /**< Rotor speed [RPM] from ripple count. */
+    uint16_t getMotorSpeedRAD();         /**< Rotor speed [rad/s] from ripple count. */
+    uint16_t getMotorSpeedShaftRPM();    /**< Output shaft speed [RPM] (after reduction). */
+    uint16_t getMotorSpeedShaftRAD();    /**< Output shaft speed [rad/s] (after reduction). */
+    uint8_t  getMotorSpeedRegister();    /**< Raw RC_STATUS1 register value. */
+    uint16_t getRippleCount();           /**< 16-bit ripple counter. */
+    float    getMotorVoltage();          /**< Motor voltage [V] (scaled by voltage range). */
+    uint8_t  getMotorVoltageRegister();  /**< Raw REG_STATUS1 register value. */
+    float    getMotorCurrent();          /**< Motor current [A] (scaled by CS_GAIN_SEL). */
+    uint8_t  getMotorCurrentRegister();  /**< Raw REG_STATUS2 register value. */
+    uint8_t  getDutyCycle();             /**< Bridge duty cycle [0..100 %]. */
     /** @} */
 
     /** @name Raw Register Getters
      *  @{ */
-    uint8_t  getCONFIG0();
-    uint16_t getInrushDuration();
-    uint8_t  getCONFIG3();
-    uint8_t  getCONFIG4();
-    uint8_t  getREG_CTRL0();
-    uint8_t  getREG_CTRL1();
-    uint8_t  getREG_CTRL2();
-    uint8_t  getRC_CTRL0();
-    uint8_t  getRC_CTRL1();
-    uint8_t  getRC_CTRL2();
+    uint8_t  getCONFIG0();               /**< Read CONFIG0 register. */
+    uint16_t getInrushDuration();        /**< Read 16-bit inrush duration [ms]. */
+    uint8_t  getCONFIG3();               /**< Read CONFIG3 register. */
+    uint8_t  getCONFIG4();               /**< Read CONFIG4 register. */
+    uint8_t  getREG_CTRL0();             /**< Read REG_CTRL0 register. */
+    uint8_t  getREG_CTRL1();             /**< Read REG_CTRL1 (WSET_VSET). */
+    uint8_t  getREG_CTRL2();             /**< Read REG_CTRL2 register. */
+    uint8_t  getRC_CTRL0();              /**< Read RC_CTRL0 register. */
+    uint8_t  getRC_CTRL1();              /**< Read RC_CTRL1 (threshold low). */
+    uint8_t  getRC_CTRL2();              /**< Read RC_CTRL2 register. */
     uint16_t getRippleThreshold();       /**< 10-bit ripple threshold (unscaled). */
     uint16_t getRippleThresholdScaled(); /**< Effective threshold (threshold x scale). */
     uint16_t getRippleThresholdScale();  /**< Threshold scale factor bits. */
-    uint8_t  getKMC();
-    uint8_t  getKMCScale();
-    uint8_t  getFilterDamping();
-    uint8_t  getRC_CTRL6();
-    uint8_t  getRC_CTRL7();
-    uint8_t  getRC_CTRL8();
+    uint8_t  getKMC();                   /**< Read KMC register value. */
+    uint8_t  getKMCScale();              /**< Read KMC scale bits. */
+    uint8_t  getFilterDamping();         /**< Read filter damping coefficient. */
+    uint8_t  getRC_CTRL6();              /**< Read RC_CTRL6 register. */
+    uint8_t  getRC_CTRL7();              /**< Read RC_CTRL7 (KP). */
+    uint8_t  getRC_CTRL8();              /**< Read RC_CTRL8 (KI). */
     /** @} */
 
     /** @name Configuration Functions
      *  @{ */
-    void enableHbridge();
-    void disableHbridge();
-    void setStallDetection(bool stall_en);
-    void setVoltageRange(bool range);
-    void setOvervoltageProtection(bool ovp);
-    void resetRippleCounter();
-    void resetFaultFlags();
-    void enableDutyCycleControl();
-    void disableDutyCycleControl();
-    void setInrushDuration(uint16_t inrush_dur);
-    void setCurrentRegMode(uint8_t mode);
-    void setStallBehavior(bool behavior);
-    void setInternalVoltageReference(float reference_voltage);
-    void configureConfig3(uint8_t config3);
-    void setI2CControl(bool I2CControl);
-    void enablePWMControl();
-    void enablePHENControl();
-    void enableStallInterrupt();
-    void disableStallInterrupt();
-    void enableCountThresholdInterrupt();
-    void disableCountThresholdInterrupt();
-    void setBridgeBehaviorThresholdReached(bool stops);
-    void setSoftStartStop(bool enable);
-    void configureControl0(uint8_t control0);
+    void enableHbridge();                               /**< Enable driver outputs (EN_OUT=1). */
+    void disableHbridge();                              /**< Disable driver outputs (Hi-Z). */
+    void setStallDetection(bool stall_en);              /**< Enable/disable stall detection. */
+    void setVoltageRange(bool range);                   /**< Set voltage range (false=0..15.7V, true=0..3.92V). */
+    void setOvervoltageProtection(bool ovp);            /**< Enable/disable overvoltage protection. */
+    void resetRippleCounter();                          /**< Clear the 16-bit ripple counter. */
+    void resetFaultFlags();                             /**< Clear all fault flags (disables/re-enables H-bridge). */
+    void enableDutyCycleControl();                      /**< Enable duty-cycle control mode. */
+    void disableDutyCycleControl();                     /**< Disable duty-cycle control mode. */
+    void setInrushDuration(uint16_t inrush_dur);        /**< Set stall-detection blanking time [ms]. */
+    void setCurrentRegMode(uint8_t mode);               /**< Set IMODE [1:0] current regulation mode (0..3). */
+    void setStallBehavior(bool behavior);               /**< Set stall action (false=disable, true=keep driving). */
+    void setInternalVoltageReference(float reference_voltage); /**< Set VREF (0 = internal 500mV). */
+    void configureConfig3(uint8_t config3);             /**< Write raw CONFIG3 register. */
+    void setI2CControl(bool I2CControl);                /**< Enable/disable I2C bridge control. */
+    void enablePWMControl();                            /**< Set PWM control mode. */
+    void enablePHENControl();                           /**< Set PH/EN control mode. */
+    void enableStallInterrupt();                        /**< Enable stall reporting on nFAULT. */
+    void disableStallInterrupt();                       /**< Disable stall reporting on nFAULT. */
+    void enableCountThresholdInterrupt();               /**< Enable ripple count threshold reporting. */
+    void disableCountThresholdInterrupt();              /**< Disable ripple count threshold reporting. */
+    void setBridgeBehaviorThresholdReached(bool stops); /**< Set bridge action at ripple threshold. */
+    void setSoftStartStop(bool enable);                 /**< Enable/disable soft start/stop ramp. */
+    void configureControl0(uint8_t control0);           /**< Write raw REG_CTRL0 register. */
 
     /**
      * @brief Set the target speed for SPEED regulation mode.
@@ -379,21 +372,21 @@ public:
      */
     void setRegulationAndStallCurrent(float requested_current);
 
-    void configureControl2(uint8_t control2);
-    void enableRippleCount(bool enable = true);
-    void enableErrorCorrection(bool enable = true);
-    void configureRippleCount0(uint8_t ripple0);
-    void setRippleCountThreshold(uint16_t threshold);
-    void setRippleThresholdScale(uint8_t scale);
-    void setKMCScale(uint8_t scale);
-    void setMotorInverseResistance(uint8_t resistance);
-    void setMotorInverseResistanceScale(uint8_t scale);
-    void setResistanceRelatedParameters();
-    void setKMC(uint8_t factor);
-    void setFilterDamping(uint8_t damping);
-    void configureRippleCount6(uint8_t ripple6);
-    void configureRippleCount7(uint8_t ripple7);
-    void configureRippleCount8(uint8_t ripple8);
+    void configureControl2(uint8_t control2);           /**< Write raw REG_CTRL2 register. */
+    void enableRippleCount(bool enable = true);         /**< Enable/disable ripple counting. */
+    void enableErrorCorrection(bool enable = true);     /**< Enable/disable ripple error correction. */
+    void configureRippleCount0(uint8_t ripple0);        /**< Write raw RC_CTRL0 register. */
+    void setRippleCountThreshold(uint16_t threshold);   /**< Set ripple count threshold (auto-scales). */
+    void setRippleThresholdScale(uint8_t scale);        /**< Set threshold scale bits (0..3). */
+    void setKMCScale(uint8_t scale);                    /**< Set KMC scale bits. */
+    void setMotorInverseResistance(uint8_t resistance); /**< Write INV_R register. */
+    void setMotorInverseResistanceScale(uint8_t scale); /**< Set INV_R scale bits. */
+    void setResistanceRelatedParameters();              /**< Auto-compute and write INV_R from motor resistance. */
+    void setKMC(uint8_t factor);                        /**< Write KMC register value. */
+    void setFilterDamping(uint8_t damping);             /**< Write filter damping coefficient. */
+    void configureRippleCount6(uint8_t ripple6);        /**< Write raw RC_CTRL6 register. */
+    void configureRippleCount7(uint8_t ripple7);        /**< Write raw RC_CTRL7 register. */
+    void configureRippleCount8(uint8_t ripple8);        /**< Write raw RC_CTRL8 register. */
     /** @} */
 
     /** @name Motor Control
@@ -463,12 +456,12 @@ public:
 
     /** @name Debug / Diagnostics
      *  @{ */
-    void printMotorConfig(bool initial_config = false);
-    void printFaultStatus();
-#ifdef DRV8214_PLATFORM_ARDUINO
-    /** @brief Set the output stream for debug messages (e.g. &Serial). */
-    void setDebugStream(Stream* debugPort);
-#endif
+    void printMotorConfig(bool initial_config = false); /**< Print driver configuration. */
+    void printFaultStatus();                            /**< Print decoded fault register flags. */
+    #ifdef DRV8214_PLATFORM_ARDUINO
+        /** @brief Set the output stream for debug messages (e.g. &Serial). */
+        void setDebugStream(Stream* debugPort);
+    #endif
     /** @} */
 };
 
