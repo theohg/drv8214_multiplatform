@@ -1,0 +1,76 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  # Run CI tests before releasing
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  # Create release only if CI passes
+  release:
+    needs: ci
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Build and Package Library
+        run: |
+          TAG_NAME=${{ steps.version.outputs.VERSION }}
+          zip -r "drv8214_multiplatform-${TAG_NAME}.zip" src include examples library.json LICENSE.txt README.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "DRV8214 Library ${{ steps.version.outputs.VERSION }}"
+          body: |
+            ## DRV8214 Motor Driver Library ${{ steps.version.outputs.VERSION }}
+
+            C++ library for controlling the TI DRV8214 brushed DC motor driver via I2C.
+
+            ### Supported Platforms
+            - Arduino (AVR, ESP32, etc.)
+            - STM32 (STM32duino & HAL)
+
+            ### Installation
+
+            #### PlatformIO
+            Add to your `platformio.ini`:
+            ```ini
+            lib_deps =
+                https://github.com/your-username/drv8214_multiplatform.git#${{ steps.version.outputs.VERSION }}
+            ```
+
+            Or download the zip and place in your project's `lib/` directory.
+
+            #### Arduino IDE
+            1. Download `drv8214_multiplatform-${{ steps.version.outputs.VERSION }}.zip`
+            2. In Arduino IDE: Sketch → Include Library → Add .ZIP Library
+            3. Select the downloaded zip file
+
+            ### Examples
+            - `basic_motor_control` - Basic motor control operations
+            - `fault_monitoring` - Fault detection and handling
+
+            See the `examples/` folder for complete code.
+
+            ### Documentation
+            Full documentation at [README.md](https://github.com/${{ github.repository }})
+          files: |
+            drv8214_multiplatform-*.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
