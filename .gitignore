@@ -50,3 +50,4 @@ ui_*.h
 .idea/
 .vscode/
 *.log
+CLAUDE.md

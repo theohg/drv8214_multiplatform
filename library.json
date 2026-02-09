@@ -1,19 +1,32 @@
 {
-    "name": "drv8214_mutiplatform",
+    "name": "drv8214_multiplatform",
     "version": "1.0.0",
-    "description": "C++ library for the DRV8214 motor driver",
-    "keywords": "motor, driver, sensorless, drv8214, arduino, esp32, stm32",
+    "description": "C++ library for the TI DRV8214 brushed DC motor driver with I2C control, ripple counting, and multi-regulation modes",
+    "keywords": [
+        "motor",
+        "driver",
+        "sensorless",
+        "drv8214",
+        "arduino",
+        "esp32",
+        "stm32",
+        "i2c",
+        "ripple-counting",
+        "brushed-dc"
+    ],
     "authors": [
-      {
-        "name": "Théo Heng",
-        "email": "theoheng@icloud.com"
-      }
+        {
+            "name": "Theo Heng",
+            "email": "theoheng@icloud.com",
+            "maintainer": true
+        }
     ],
     "repository": {
-      "type": "git",
-      "url": "https://github.com/PatateMagique/drv8214_multiplatform"
+        "type": "git",
+        "url": "https://github.com/theohg/drv8214_multiplatform"
     },
+    "license": "MIT",
     "frameworks": "arduino",
-    "platforms": "*"
-  }
-  
+    "platforms": "*",
+    "headers": "drv8214.h"
+}
