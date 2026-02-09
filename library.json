@@ -30,6 +30,9 @@
     "platforms": "*",
     "build": {
         "srcDir": "src",
-        "includeDir": "include"
+        "includeDir": "include",
+        "flags": [
+            "-I include"
+        ]
     }
 }
