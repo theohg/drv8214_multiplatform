@@ -37,6 +37,10 @@ jobs:
         run: pip install platformio
 
       - name: Compile examples
+        env:
+          # This tells PlatformIO to look for libraries in the root of the checkout
+          PLATFORMIO_LIB_EXTRA_DIRS: ${{ github.workspace }}
         run: |
-          pio ci --lib="." --board=${{ matrix.board }} examples/basic_motor_control/basic_motor_control.ino
-          pio ci --lib="." --board=${{ matrix.board }} examples/fault_monitoring/fault_monitoring.ino
+          # Removed --lib="."
+          pio ci --board=${{ matrix.board }} examples/basic_motor_control/basic_motor_control.ino
+          pio ci --board=${{ matrix.board }} examples/fault_monitoring/fault_monitoring.ino
