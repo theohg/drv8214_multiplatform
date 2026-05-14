@@ -8,9 +8,52 @@
 
 #include "drv8214.h"
 
+uint8_t DRV8214::drv8214_i2c_write_register(uint8_t device_address, uint8_t reg, uint8_t value) {
+    if (_bus == NULL) {
+        _lastError = DRV8214_ERR_HANDLE;
+        return _lastError;
+    }
+    _lastError = ::drv8214_i2c_write_register(_bus, device_address, reg, value)
+               ? DRV8214_OK : DRV8214_ERR_I2C;
+    return _lastError;
+}
+
+uint8_t DRV8214::drv8214_i2c_read_register(uint8_t device_address, uint8_t reg) {
+    if (_bus == NULL) {
+        _lastError = DRV8214_ERR_HANDLE;
+        return 0;
+    }
+
+    uint8_t value = 0;
+    _lastError = ::drv8214_i2c_read_register(_bus, device_address, reg, &value)
+               ? DRV8214_OK : DRV8214_ERR_I2C;
+    return (_lastError == DRV8214_OK) ? value : 0;
+}
+
+uint8_t DRV8214::drv8214_i2c_modify_register(uint8_t device_address, uint8_t reg, uint8_t mask, uint8_t enable_bits) {
+    if (_bus == NULL) {
+        _lastError = DRV8214_ERR_HANDLE;
+        return _lastError;
+    }
+    _lastError = ::drv8214_i2c_modify_register(_bus, device_address, reg, mask, enable_bits)
+               ? DRV8214_OK : DRV8214_ERR_I2C;
+    return _lastError;
+}
+
+uint8_t DRV8214::drv8214_i2c_modify_register_bits(uint8_t device_address, uint8_t reg, uint8_t mask, uint8_t new_value) {
+    if (_bus == NULL) {
+        _lastError = DRV8214_ERR_HANDLE;
+        return _lastError;
+    }
+    _lastError = ::drv8214_i2c_modify_register_bits(_bus, device_address, reg, mask, new_value)
+               ? DRV8214_OK : DRV8214_ERR_I2C;
+    return _lastError;
+}
+
 /* ──────────────────── Initialization ──────────────────── */
 
 uint8_t DRV8214::init(const DRV8214_Config& cfg) {
+    _lastError = DRV8214_OK;
     config = cfg;
 
     disableHbridge();
@@ -37,7 +80,7 @@ uint8_t DRV8214::init(const DRV8214_Config& cfg) {
 
     if (config.verbose) { printMotorConfig(true); }
 
-    return DRV8214_OK;
+    return _lastError;
 }
 
 /* ──────────────────── Status Getters ──────────────────── */
@@ -50,11 +93,11 @@ uint8_t DRV8214::getDriverID() {
     return driver_ID;
 }
 
-uint8_t DRV8214::getSenseResistor() {
+uint16_t DRV8214::getSenseResistor() {
     return Ripropri;
 }
 
-uint8_t DRV8214::getRipplesPerRevolution() {
+uint16_t DRV8214::getRipplesPerRevolution() {
     return ripples_per_revolution;
 }
 
@@ -67,7 +110,7 @@ uint32_t DRV8214::getMotorSpeedRPM() {
             / (2 * M_PI * ripples_per_revolution));
 }
 
-uint16_t DRV8214::getMotorSpeedRAD() {
+uint32_t DRV8214::getMotorSpeedRAD() {
     return ((drv8214_i2c_read_register(address, DRV8214_RC_STATUS1) * config.w_scale)
             / ripples_per_revolution);
 }

@@ -41,8 +41,13 @@ jobs:
             C++ library for controlling the TI DRV8214 brushed DC motor driver via I2C.
 
             ### Supported Platforms
-            - Arduino (AVR, ESP32, etc.)
+            - Arduino / ESP32 (Wire)
             - STM32 (STM32duino & HAL)
+            - RP2040 (Arduino core or Pico SDK)
+
+            ### Usage Model
+            - Pass the active bus handle directly to the constructor (`&Wire`, `&hi2c1`, `i2c0`)
+            - Use 7-bit I2C device addresses on every platform
 
             ### Installation
 
@@ -50,7 +55,7 @@ jobs:
             Add to your `platformio.ini`:
             ```ini
             lib_deps =
-                https://github.com/your-username/drv8214_multiplatform.git#${{ steps.version.outputs.VERSION }}
+                https://github.com/theohg/drv8214_multiplatform.git#${{ steps.version.outputs.VERSION }}
             ```
 
             Or download the zip and place in your project's `lib/` directory.
@@ -67,7 +72,7 @@ jobs:
             See the `examples/` folder for complete code.
 
             ### Documentation
-            Full documentation at [README.md](https://github.com/${{ github.repository }})
+            Full documentation at https://github.com/${{ github.repository }}
           files: |
             drv8214_multiplatform-*.zip
           draft: false

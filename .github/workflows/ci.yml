@@ -20,6 +20,8 @@ jobs:
             name: Arduino Nano
           - board: nucleo_wb55rg_p
             name: STM32 (STM32duino)
+          - board: pico
+            name: RP2040
 
     name: ${{ matrix.name }}
     steps:
@@ -39,7 +41,5 @@ jobs:
 
       - name: Compile examples
         run: |
-          # Use the current directory as a library dependency.
-          # We use $PWD to ensure the path is absolute and correctly resolved.
           pio ci --board=${{ matrix.board }} --project-option="lib_deps=$PWD" --project-option="lib_ldf_mode=deep+" examples/basic_motor_control/basic_motor_control.ino
           pio ci --board=${{ matrix.board }} --project-option="lib_deps=$PWD" --project-option="lib_ldf_mode=deep+" examples/fault_monitoring/fault_monitoring.ino

@@ -240,12 +240,14 @@ struct DRV8214_Config {
 class DRV8214 {
 
 private:
+    bus_handle_t _bus;                  /**< Platform-specific I2C bus handle. */
+    uint8_t  _lastError = DRV8214_OK;   /**< Last transport-level error for this instance. */
     uint8_t  address;                   /**< 7-bit I2C address. */
     uint8_t  driver_ID;                 /**< Identifier when using multiple drivers. */
     uint16_t Ripropri;                  /**< IPROPI sense resistor [Ohms]. */
     uint16_t ripples_per_revolution;    /**< Current ripples per rotor revolution. */
     uint8_t  motor_internal_resistance; /**< Motor winding resistance [Ohms]. */
-    uint8_t  motor_reduction_ratio;     /**< Gearbox reduction ratio. */
+    uint16_t motor_reduction_ratio;     /**< Gearbox reduction ratio. */
     uint16_t motor_max_rpm;             /**< Maximum motor RPM. */
 
     DRV8214_Config config;
@@ -254,11 +256,16 @@ private:
     Stream* _debugPort = nullptr;
 #endif
 
+    uint8_t drv8214_i2c_write_register(uint8_t device_address, uint8_t reg, uint8_t value);
+    uint8_t drv8214_i2c_read_register(uint8_t device_address, uint8_t reg);
+    uint8_t drv8214_i2c_modify_register(uint8_t device_address, uint8_t reg, uint8_t mask, uint8_t enable_bits);
+    uint8_t drv8214_i2c_modify_register_bits(uint8_t device_address, uint8_t reg, uint8_t mask, uint8_t new_value);
     void drvPrint(const char* message);
 
 public:
     /**
      * @brief Construct a DRV8214 driver instance.
+     * @param bus             Platform-specific I2C bus handle.
      * @param addr            7-bit I2C address (use DRV8214_I2C_ADDR_xx defines).
      * @param id              Driver identifier (for multi-driver setups).
      * @param sense_resistor  IPROPI resistor value [Ohms].
@@ -267,9 +274,9 @@ public:
      * @param reduction_ratio Gearbox reduction ratio.
      * @param rpm             Maximum motor RPM.
      */
-    DRV8214(uint8_t addr, uint8_t id, uint16_t sense_resistor, uint8_t ripples,
-            uint8_t rm, uint8_t reduction_ratio, uint16_t rpm)
-        : address(addr), driver_ID(id), Ripropri(sense_resistor),
+        DRV8214(bus_handle_t bus, uint8_t addr, uint8_t id, uint16_t sense_resistor, uint16_t ripples,
+            uint8_t rm, uint16_t reduction_ratio, uint16_t rpm)
+        : _bus(bus), address(addr), driver_ID(id), Ripropri(sense_resistor),
           ripples_per_revolution(ripples), motor_internal_resistance(rm),
           motor_reduction_ratio(reduction_ratio), motor_max_rpm(rpm) {}
 
@@ -284,11 +291,11 @@ public:
      *  @{ */
     uint8_t  getDriverAddress();         /**< 7-bit I2C address. */
     uint8_t  getDriverID();              /**< Driver identifier. */
-    uint8_t  getSenseResistor();         /**< IPROPI sense resistor [Ohms]. */
-    uint8_t  getRipplesPerRevolution();  /**< Ripples per rotor revolution. */
+    uint16_t getSenseResistor();         /**< IPROPI sense resistor [Ohms]. */
+    uint16_t getRipplesPerRevolution();  /**< Ripples per rotor revolution. */
     uint8_t  getFaultStatus();           /**< Read the FAULT register. */
     uint32_t getMotorSpeedRPM();         /**< Rotor speed [RPM] from ripple count. */
-    uint16_t getMotorSpeedRAD();         /**< Rotor speed [rad/s] from ripple count. */
+    uint32_t getMotorSpeedRAD();         /**< Rotor speed [rad/s] from ripple count. */
     uint16_t getMotorSpeedShaftRPM();    /**< Output shaft speed [RPM] (after reduction). */
     uint16_t getMotorSpeedShaftRAD();    /**< Output shaft speed [rad/s] (after reduction). */
     uint8_t  getMotorSpeedRegister();    /**< Raw RC_STATUS1 register value. */

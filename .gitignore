@@ -1,53 +1,8 @@
-# macOS system files
 .DS_Store
-
-# Compiled object files
-*.o
-*.obj
-*.lo
-*.la
-
-# Executables and binaries
-*.exe
-*.out
-*.app
-*.bin
-
-# CMake build files
-/build/
-/CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
-
-# Code::Blocks
-*.cbp
-*.depend
-*.layout
-
-# Qt Creator
-*.pro.user
-*.moc
-moc_*.cpp
-qrc_*.cpp
-ui_*.h
-
-# Visual Studio
-*.sln
-*.vcxproj*
-*.ncb
-*.pdb
-*.suo
-*.user
-*.opendb
-*.VC.db
-
-# Eclipse
-.cproject
-.project
-.settings/
-
-# Other IDEs and Temporary Files
+.pio/
 .idea/
 .vscode/
+build/
+CMakeFiles/
+CMakeCache.txt
 *.log
-CLAUDE.md

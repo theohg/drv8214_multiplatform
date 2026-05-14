@@ -1,6 +1,6 @@
 {
     "name": "drv8214_multiplatform",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "C++ library for the TI DRV8214 brushed DC motor driver with I2C control, ripple counting, and multi-regulation modes",
     "keywords": [
         "motor",
@@ -10,6 +10,7 @@
         "arduino",
         "esp32",
         "stm32",
+        "rp2040",
         "i2c",
         "ripple-counting",
         "brushed-dc"
@@ -26,7 +27,10 @@
         "url": "https://github.com/theohg/drv8214_multiplatform"
     },
     "license": "MIT",
-    "frameworks": "arduino",
+    "frameworks": [
+        "arduino",
+        "raspberrypi-pico"
+    ],
     "platforms": "*",
     "build": {
         "srcDir": "src",

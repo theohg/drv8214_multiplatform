@@ -14,11 +14,17 @@
 
 #if defined(ESP32) || defined(ESP_PLATFORM) || defined(ARDUINO)
     #define DRV8214_PLATFORM_ARDUINO
+    #ifndef PLATFORM_ARDUINO
+        #define PLATFORM_ARDUINO
+    #endif
     #include <Arduino.h>
 
 #elif defined(USE_HAL_DRIVER) || defined(USE_STM32_HAL_DRIVER) || defined(DRV8214_PLATFORM_STM32)
     #ifndef DRV8214_PLATFORM_STM32
         #define DRV8214_PLATFORM_STM32
+    #endif
+    #ifndef PLATFORM_STM32
+        #define PLATFORM_STM32
     #endif
     #include <stdio.h>
     #include <math.h>
@@ -71,8 +77,17 @@
         #error "STM32 family not detected. Define DRV8214_STM32_HAL_HEADER in build flags."
     #endif
 
+#elif defined(PICO_BOARD) || defined(PICO_RP2040) || defined(PICO_SDK_VERSION_MAJOR)
+    #define DRV8214_PLATFORM_RP2040
+    #ifndef PLATFORM_RP2040
+        #define PLATFORM_RP2040
+    #endif
+    #include <stdio.h>
+    #include <math.h>
+    #include "hardware/i2c.h"
+
 #else
-    #error "Unsupported platform. Define DRV8214_PLATFORM_ARDUINO or DRV8214_PLATFORM_STM32 manually."
+    #error "Unsupported platform. Define DRV8214_PLATFORM_ARDUINO, DRV8214_PLATFORM_STM32, or DRV8214_PLATFORM_RP2040 manually."
 #endif
 
 #endif /* DRV8214_PLATFORM_CONFIG_H */

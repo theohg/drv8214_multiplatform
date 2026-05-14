@@ -17,12 +17,28 @@
 #define REDUCTION_RATIO   298    // Gearbox ratio
 #define MAX_RPM           100    // Max motor RPM
 
-DRV8214 motor(I2C_ADDR, 0, SENSE_RESISTOR, RIPPLES_PER_REV,
+#if (defined(PICO_BOARD) || defined(PICO_RP2040) || defined(PICO_SDK_VERSION_MAJOR)) && !defined(ARDUINO)
+#include "hardware/gpio.h"
+void initBus() {
+    i2c_init(i2c0, 400000);
+    gpio_set_function(4, GPIO_FUNC_I2C);
+    gpio_set_function(5, GPIO_FUNC_I2C);
+    gpio_pull_up(4);
+    gpio_pull_up(5);
+}
+DRV8214 motor(i2c0, I2C_ADDR, 0, SENSE_RESISTOR, RIPPLES_PER_REV,
               MOTOR_RESISTANCE, REDUCTION_RATIO, MAX_RPM);
+#else
+void initBus() {
+    Wire.begin();
+}
+DRV8214 motor(&Wire, I2C_ADDR, 0, SENSE_RESISTOR, RIPPLES_PER_REV,
+              MOTOR_RESISTANCE, REDUCTION_RATIO, MAX_RPM);
+#endif
 
 void setup() {
     Serial.begin(115200);
-    Wire.begin();
+    initBus();
 
     motor.setDebugStream(&Serial);
 
