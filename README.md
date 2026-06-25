@@ -241,6 +241,7 @@ graph LR
 
 - [BQ25756E Multiplatform](https://github.com/theohg/bq25756e_multiplatform)
 - [INA228 Multiplatform](https://github.com/theohg/ina228_multiplatform)
+- [TPS26750 Multiplatform](https://github.com/theohg/tps26750_multiplatform)
 
 ## License
 
