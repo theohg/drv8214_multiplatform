@@ -28,6 +28,7 @@
     #endif
     #include <stdio.h>
     #include <math.h>
+    #include <string.h>
 
     /* Auto-detect STM32 family HAL header, or override via build flag:
        -DDRV8214_STM32_HAL_HEADER='"stm32f4xx_hal.h"'                    */
@@ -84,6 +85,7 @@
     #endif
     #include <stdio.h>
     #include <math.h>
+    #include <string.h>
     #include "hardware/i2c.h"
 
 #else
