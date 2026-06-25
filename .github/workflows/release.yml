@@ -29,7 +29,7 @@ jobs:
       - name: Build and Package Library
         run: |
           TAG_NAME=${{ steps.version.outputs.VERSION }}
-          zip -r "drv8214_multiplatform-${TAG_NAME}.zip" src include examples library.json LICENSE.txt README.md
+          zip -r "drv8214_multiplatform-${TAG_NAME}.zip" src include examples library.json library.properties LICENSE.txt README.md
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
