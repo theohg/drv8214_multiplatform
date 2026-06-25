@@ -29,50 +29,85 @@ jobs:
       - name: Build and Package Library
         run: |
           TAG_NAME=${{ steps.version.outputs.VERSION }}
-          zip -r "drv8214_multiplatform-${TAG_NAME}.zip" src include examples library.json library.properties LICENSE.txt README.md
+          zip -r "drv8214_multiplatform-${TAG_NAME}.zip" src include examples library.json library.properties LICENSE.txt README.md CHANGELOG.md
+
+      # Build the release body from the top CHANGELOG.md entry (the version being
+      # tagged) followed by the fixed install/platform boilerplate.
+      - name: Extract release notes
+        env:
+          VERSION: ${{ steps.version.outputs.VERSION }}
+          REPO: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+
+          version = os.environ["VERSION"]
+          repo = os.environ["REPO"]
+
+          changelog = Path("CHANGELOG.md").read_text().splitlines()
+          notes = []
+          capture = False
+          for line in changelog:
+            if line.startswith("## "):
+              if capture:
+                break
+              capture = True
+            if capture:
+              notes.append(line)
+
+          if not notes:
+            raise SystemExit("No release notes found in CHANGELOG.md")
+
+          body = [
+              f"## DRV8214 Motor Driver Library {version}",
+              "",
+              "C++ library for controlling the TI DRV8214 brushed DC motor driver via I2C.",
+              "",
+              *notes[1:],
+              "",
+              "### Supported Platforms",
+              "- Arduino / ESP32 (Wire)",
+              "- STM32 (STM32duino & HAL)",
+              "- RP2040 (Arduino core or Pico SDK)",
+              "",
+              "### Usage Model",
+              "- Pass the active bus handle directly to the constructor (`&Wire`, `&hi2c1`, `i2c0`)",
+              "- Use 7-bit I2C device addresses on every platform",
+              "",
+              "### Installation",
+              "",
+              "#### PlatformIO",
+              "Add to your `platformio.ini`:",
+              "```ini",
+              "lib_deps =",
+              f"    https://github.com/theohg/drv8214_multiplatform.git#{version}",
+              "```",
+              "",
+              "Or download the zip and place in your project's `lib/` directory.",
+              "",
+              "#### Arduino IDE",
+              f"1. Download `drv8214_multiplatform-{version}.zip`",
+              "2. In Arduino IDE: Sketch → Include Library → Add .ZIP Library",
+              "3. Select the downloaded zip file",
+              "",
+              "### Examples",
+              "- `basic_motor_control` - Basic motor control operations",
+              "- `fault_monitoring` - Fault detection and handling",
+              "",
+              "See the `examples/` folder for complete code.",
+              "",
+              "### Documentation",
+              f"Full documentation at https://github.com/{repo}",
+          ]
+          Path("release-body.md").write_text("\n".join(body) + "\n")
+          PY
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           name: "DRV8214 Library ${{ steps.version.outputs.VERSION }}"
-          body: |
-            ## DRV8214 Motor Driver Library ${{ steps.version.outputs.VERSION }}
-
-            C++ library for controlling the TI DRV8214 brushed DC motor driver via I2C.
-
-            ### Supported Platforms
-            - Arduino / ESP32 (Wire)
-            - STM32 (STM32duino & HAL)
-            - RP2040 (Arduino core or Pico SDK)
-
-            ### Usage Model
-            - Pass the active bus handle directly to the constructor (`&Wire`, `&hi2c1`, `i2c0`)
-            - Use 7-bit I2C device addresses on every platform
-
-            ### Installation
-
-            #### PlatformIO
-            Add to your `platformio.ini`:
-            ```ini
-            lib_deps =
-                https://github.com/theohg/drv8214_multiplatform.git#${{ steps.version.outputs.VERSION }}
-            ```
-
-            Or download the zip and place in your project's `lib/` directory.
-
-            #### Arduino IDE
-            1. Download `drv8214_multiplatform-${{ steps.version.outputs.VERSION }}.zip`
-            2. In Arduino IDE: Sketch → Include Library → Add .ZIP Library
-            3. Select the downloaded zip file
-
-            ### Examples
-            - `basic_motor_control` - Basic motor control operations
-            - `fault_monitoring` - Fault detection and handling
-
-            See the `examples/` folder for complete code.
-
-            ### Documentation
-            Full documentation at https://github.com/${{ github.repository }}
+          body_path: release-body.md
           files: |
             drv8214_multiplatform-*.zip
           draft: false
